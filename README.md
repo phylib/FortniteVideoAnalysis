@@ -4,5 +4,5 @@ In this repository, we provide information and source code about the **Game Vide
 
 The repository is structured as follows:
 
-- Data: Contains trace files as well as survey data.
-- Toolchain: Contains information and source code from the toolchain and information and how to use it.
+- **Data**: Contains trace files as well as survey data.
+- **Toolchain**: Contains information and source code from the toolchain and information and how to use it.
