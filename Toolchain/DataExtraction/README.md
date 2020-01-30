@@ -59,3 +59,12 @@ optional:
 
 * '-o', '--output': Output file name.
 * '-p', '--print': Print output if True. (type=bool, default=False)
+
+## Starting the script
+
+    cat ~/Desktop/all_fn_videos.txt | xargs -P 6 -I {} python3 template_match_4_scaled.py -i {} -o ~/Desktop/ -t False -v false
+    
+- `-o` output folder
+
+In the file `all_fn_videos.txt` a list of all current videos can be found.
+
