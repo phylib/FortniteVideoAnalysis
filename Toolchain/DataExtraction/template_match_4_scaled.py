@@ -1079,3 +1079,4 @@ if __name__ == '__main__':
         if visualization_general_info:
             print(
                 "|######################################ABORTED_GAME####################################|")
+
