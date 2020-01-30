@@ -1,10 +1,14 @@
 ## Heatmap Generation Script
 
-This script generates the heatmaps based on trace-files and the meta-file generated form "get_player_group_size.py". It generates up to 4 heatmaps depending on which parameters are given. The "all" and "kills" map are always generated, the start-heatmap and end-heatmap map are only generated if no start-time and no end-time are given.
+This script generates the heatmaps based on trace-files and the meta-file. It generates up to 4 heatmaps depending on which parameters are given. The "all" and "kills" map are always generated, the start-heatmap and end-heatmap map are only generated if no start-time and no end-time are given.
 Start-heatmap uses the first seconds of the tracings where the player landed. End-heatmap the last seconds.
 The kills-heatmap marks the places from which the player has killed another player from. (The Kills marked are also constrained by the min & max distance parameter. In order to receive an kills-heatmap with all the kills you have to set '-n 0' (min) and not set a 'x-'(max) as shown in an example below.)
 
 To use it, you need 'python3' and a number of python packages, such as  “heatmappy.py”. Python will tell you which packages are messing, install them with pip3.
+
+Changes to the original meta-file are adding 2 columns "playtime" and "tracename" after the "kills" column.
+* playtime: Endtime - starttime ; for easier filtering
+* tracename: "text to column" Function on the "video" column (spliting by "/" and ".") and using concat to recreate the tracefile name; Example: '=CONCAT("round-",<text to column cut>,"_",<roundId>,".csv"')
 
 Use the script:
 
@@ -21,7 +25,7 @@ necessary:
 optional:
 
 * '-t', '--time': Set the time given in seconds for the start and end heatmap (type=int, default=5)
-* '-x', '--max': Max distance a player moves per sec (type=float, default=3.606)
+* '-x', '--max': Max distance a player moves per sec (type=float, default=22)
 * '-n', '--min': Min distance a player moves per sec (lowest value = 0) (type=float, default=1)
 * '-w', '--won': Filter if match was won or lost (type=bool, default=None)
 * '-g', '--groupsize', Generate the heatmap with the given group-size (type=int, default=None)
