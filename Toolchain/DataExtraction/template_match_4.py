@@ -30,11 +30,18 @@ def phase_find_best_match(region, phase_icons, mask_icon):
     result = []
     max_values = []
     max_locations = []
+
     for icon_idx in range(0, len(phase_icons)):
         result.append(cv.matchTemplate(region, phase_icons[icon_idx], cv.TM_CCORR_NORMED, mask=mask_icon))
         min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result[-1])
         max_values.append(max_val)
         max_locations.append(max_loc)
+
+    # Phases index
+    # 0 - jump
+    # 1 - time till contract
+    # 2 - contracting
+    # phase_icons are checked and added in Phases index order to the max_values
     max_idx = np.argmax(max_values)
     return max_idx, max_values[max_idx], max_locations[max_idx]
 
@@ -52,14 +59,14 @@ def read_num_next_to_icon(frameV, frameV_size, icon, icon_mask, lastPosition_ico
                    max_loc[0] + lastPosition_icon[0] + 24:max_loc[0] + lastPosition_icon[0] + 45]
     else:
         res = cv.matchTemplate(
-            frameV[lastPosition_icon[1]:lastPosition_icon[1] + 45, lastPosition_icon[0]:1810],
+            frameV[lastPosition_icon[1]:lastPosition_icon[1] + 25, lastPosition_icon[0]:1810],
             icon,
             cv.TM_CCORR_NORMED, mask=icon_mask)
         min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
 
-        text_img = frameV[max_loc[1] + lastPosition_icon[1]:max_loc[1] + lastPosition_icon[1] + 33,
-                   max_loc[0] + lastPosition_icon[0] + 36:max_loc[0] + lastPosition_icon[
-                       0] + 70]
+        text_img = frameV[max_loc[1] + lastPosition_icon[1]:max_loc[1] + lastPosition_icon[1] + 20,
+                   max_loc[0] + lastPosition_icon[0] + 24:max_loc[0] + lastPosition_icon[0] + 45]
+
     # show cropped image & place found icon position on the video frame
     if visualization_read_num_next_to_icon:
         cv.imshow("text search region", region)
@@ -67,7 +74,7 @@ def read_num_next_to_icon(frameV, frameV_size, icon, icon_mask, lastPosition_ico
         cv.rectangle(frameV, (lastPosition_icon[0] + max_loc[0], lastPosition_icon[1] + max_loc[1]),
                      (lastPosition_icon[0] + max_loc[0] + icon.shape[1],
                       lastPosition_icon[1] + max_loc[1] + icon.shape[0]),
-                     255, 3)
+                     255, 1)
         # cv.imshow("funktion_icon", frameV)
         cv.waitKey(1)
     # read the text next to the icon
@@ -78,7 +85,15 @@ def read_num_next_to_icon(frameV, frameV_size, icon, icon_mask, lastPosition_ico
     pil_im = Image.fromarray(res_img)
 
     # Setting in tesseract for digits recognition(-> changing the page segmentation mode)
-    builder.tesseract_flags = ['-psm', '3']  # If tool = libtesseract
+    #builder.tesseract_layout = 3
+    #builder.tesseract_flags = ['-psm', '3']  # If tool = libtesseract
+
+    builder.tesseract_configs = ['--oem', '0', '--psm', '3', 'digits', '-c', 'tessedit_char_whitelist=0123456789']
+
+
+
+    #print(builder.tesseract_configs)
+
     number = tool.image_to_string(
         pil_im,
         lang=lang,
@@ -87,10 +102,11 @@ def read_num_next_to_icon(frameV, frameV_size, icon, icon_mask, lastPosition_ico
     # if no digit recognised or wrong one try setting reading for 1 digit
     if number == "" or len(number) > 2:
         # Setting in tesseract for single digit recognition-> changing the page segmentation mode
-        builder.tesseract_flags = ['-psm', '10']  # If tool = libtesseract
+        builder.tesseract_configs = ['--oem', '0', '--psm', '10', 'digits', '-c', 'tessedit_char_whitelist=0123456789']
+
+        #print(builder.tesseract_configs)
 
         res_img = cv.threshold(text_img, 225, 255, cv.THRESH_BINARY_INV)[1]
-        # cv.threshold(text_img, 200, 255, cv.THRESH_BINARY_INV)[1]
         pil_im = Image.fromarray(res_img)
 
         number = tool.image_to_string(
@@ -130,7 +146,7 @@ def count_pattern_and_validity_check(last_known_valid_numbers, last_recognised_c
             last_known_valid_numbers.append(newNr)
             last_known_valid_numbers = last_known_valid_numbers[1:]
 
-    else:  # TODO if last numbers are not the same add some flag?
+    else:
         # check if last 2 recog. nr are constant and stick to that
         if last_recognised_count[-2] == last_recognised_count[-3] != -666:
             last_known_valid_numbers.append(last_recognised_count[-2])
@@ -159,34 +175,61 @@ def write_round(outfile, phase, x_pos, y_pos, distance, video_time, place, kills
     outfile.close()
     return None
 
-
 ### visualization configure here ...
 
-visualization_map = False
-visualization_phase = False
+visualization_map = True
+visualization_phase = True
 visualization_deathORwin = True
-visualization_read_num_next_to_icon = False
-output_read_num_next_to_icon = False
+visualization_read_num_next_to_icon = True
+#visualization_read_num_next_to_icon = False
+output_read_num_next_to_icon = True
+#output_read_num_next_to_icon = False
 visualization_general_info = True
 
 ### variable configure here...
 # skip ahead some frames
-jump_ahead_min = 0
-jump_ahead_sec = 0
+jump_ahead_min = 7
+jump_ahead_sec = 50
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Script to parse fortnite Videos.')
     parser.add_argument("-i", "--input", help="Video file to process")
-    parser.add_argument("-m", "--metaoutput", help="Output file for round meta information")
-    parser.add_argument("-r", "--roundoutput", help="Output file for detailed information off a round")
+    #parser.add_argument("-m", "--metaoutput", help="Output file for round meta information")
+    #parser.add_argument("-r", "--roundoutput", help="Output file for detailed information off a round")
     parser.add_argument("-v", "--verbose", help="how many output to print, default, less", type=bool, default=False)
+    parser.add_argument("-o", "--outpath", help="Path for output")
+    parser.add_argument("-t", "--testrun", help="debug test run mode for single videos", type=bool, default=False)
 
     args = parser.parse_args()
     filename = args.input
-    output_all = args.metaoutput
-    output_round = args.roundoutput
+    #output_all = args.metaoutput
+    #output_round = args.roundoutput
     verbose = args.verbose
+    output_path = args.outpath
+    testrun = args.testrun
+
+    if testrun:
+        output_timestamp = time.strftime("%d-%m-%y_%H.%M.%S", time.gmtime())
+    else:
+        output_timestamp = time.strftime("%d-%m-%y", time.gmtime())
+
+    dirName = output_path + '/fn-dataextraction'
+    try:
+        os.mkdir(dirName)
+        print("Directory ", dirName, " Created ")
+    except FileExistsError:
+        print("Directory ", dirName, " already exists")
+
+    dirName = dirName + '/fn-dataextraction_' + output_timestamp
+    try:
+        os.mkdir(dirName)
+        print("Directory ", dirName, " Created ")
+    except FileExistsError:
+        print("Directory ", dirName, " already exists")
+
+    output_all = dirName+'/match-overview.csv'
+    output_round = dirName+'/round-'
 
     if not verbose:
         visualization_map = False
@@ -197,13 +240,14 @@ if __name__ == '__main__':
         visualization_general_info = False
 
     # setting up map for position tracing
-    img = cv.imread('map.png', cv.IMREAD_GRAYSCALE)
-    img_mask = cv.imread('map_mask.png', cv.IMREAD_GRAYSCALE)
-    vis_color = cv.imread('map.png', cv.IMREAD_COLOR)
+    img_map = cv.imread('Chapter_2_Season_1_Minimap_2000x2000_edited.png', cv.IMREAD_GRAYSCALE)
+    img_map_mask = cv.imread('map_mask_ch2_2000x2000.png', cv.IMREAD_GRAYSCALE)
+    vis_color = cv.imread('Chapter_2_Season_1_Minimap_2000x2000_edited.png', cv.IMREAD_COLOR)
+    #vis_color = cv.resize(vis_color, None, None, 1.39, 1.39, cv.INTER_CUBIC) # Scale ok
     clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    img = clahe.apply(img)
+    img_map = clahe.apply(img_map)
 
-    heatmap = np.zeros(img_mask.shape)
+    heatmap = np.zeros(img_map_mask.shape)
 
     lastPositions = []
 
@@ -238,24 +282,29 @@ if __name__ == '__main__':
 
     lang = 'eng'
     builder = pyocr.tesseract.DigitBuilder()
+    #builder = pyocr.builders.TextBuilder()
+    #builder = pyocr.builders.LineBoxBuilder()
 
     # Phases index
     # 0 - jump
     # 1 - time till contract
     # 2 - contracting
-    # TODO add in bus phase again?
 
     # images for phase recognition
     mask_icon720 = cv.imread("mask_icon.png")
-    mask_icon1080 = cv.resize(mask_icon720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    #mask_icon1080 = cv.resize(mask_icon720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    mask_icon1080 = cv.resize(mask_icon720, None, None, 1, 1, cv.INTER_CUBIC)
     person_icon_mask720 = cv.imread("person_icon_mask.png")
-    person_icon_mask1080 = cv.resize(person_icon_mask720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    #person_icon_mask1080 = cv.resize(person_icon_mask720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    person_icon_mask1080 = cv.resize(person_icon_mask720, None, None, 1, 1, cv.INTER_CUBIC)
 
     person_icon720 = cv.imread("person_icon.png")
-    person_icon1080 = cv.resize(person_icon720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    #person_icon1080 = cv.resize(person_icon720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    person_icon1080 = cv.resize(person_icon720, None, None, 1, 1, cv.INTER_CUBIC)
 
-    kills_icon720 = cv.imread("kills_icon.png")
-    kills_icon1080 = cv.resize(kills_icon720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    kills_icon720 = cv.imread("kills_icon_ch2.png")
+    #kills_icon1080 = cv.resize(kills_icon720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    kills_icon1080 = cv.resize(kills_icon720, None, None, 1, 1, cv.INTER_CUBIC)
 
     phase_icons720 = [cv.imread("jump_icon.png", cv.IMREAD_COLOR),
                       cv.imread("time_icon_.png", cv.IMREAD_COLOR),
@@ -263,11 +312,13 @@ if __name__ == '__main__':
 
     # image for check if jump is really jump
     jump_check_icon720 = cv.imread("jump_check_icon.png", cv.IMREAD_COLOR)
-    jump_check_icon1080 = cv.resize(jump_check_icon720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    #jump_check_icon1080 = cv.resize(jump_check_icon720, None, None, 1.5, 1.5, cv.INTER_CUBIC)
+    jump_check_icon1080 = cv.resize(jump_check_icon720, None, None, 1, 1, cv.INTER_CUBIC)
 
     phase_icons1080 = []
     for pid in range(0, len(phase_icons720)):
-        phase_icons1080.append(cv.resize(phase_icons720[pid], None, None, 1.5, 1.5, cv.INTER_CUBIC))
+        #phase_icons1080.append(cv.resize(phase_icons720[pid], None, None, 1.5, 1.5, cv.INTER_CUBIC))
+        phase_icons1080.append(cv.resize(phase_icons720[pid], None, None, 1, 1, cv.INTER_CUBIC))
         # cv.imshow("icon{:d}".format(pid), phase_icons1080[pid])
         # cv.imshow("iconorig{:d}".format(pid), phase_icons720[pid])
 
@@ -305,7 +356,7 @@ if __name__ == '__main__':
     # list of last 3 frames recognised player count
     last_recognised_player_count = [100] * 3
     # (varianz down, varianz up)
-    playerCountVarianz = (4, 3, 35, 35)  # TODO check if big var up 35 okay
+    playerCountVarianz = (4, 3, 35, 35)
 
     # kills
     # list of last 3 valid kills numbers
@@ -354,7 +405,9 @@ if __name__ == '__main__':
                 current_phase, max_val, max_loc = phase_find_best_match(region, phase_icons720, mask_icon720)
 
             else:
-                region, x1, y1 = submatrix_video(frameV, (1525, 335), (1650, 385))  # 1650        1800
+                #region, x1, y1 = submatrix_video(frameV, (1525, 335), (1650, 385))  # 1650        1800
+                #current_phase, max_val, max_loc = phase_find_best_match(region, phase_icons1080, mask_icon1080)
+                region, x1, y1 = submatrix_video(frameV, (1510, 330), (1510+300, 385))  # 1650        1800
                 current_phase, max_val, max_loc = phase_find_best_match(region, phase_icons1080, mask_icon1080)
 
             if visualization_general_info:
@@ -380,7 +433,7 @@ if __name__ == '__main__':
                                  (top_left[0] + x1 + mask_icon1080.shape[1],
                                   top_left[1] + y1 + mask_icon1080.shape[0]),
                                  255, 3)
-                cv.imshow("video", frameV)
+                #cv.imshow("video", frameV)
                 cv.imshow("region_Phase", region)
                 cv.waitKey(3)
 
@@ -591,9 +644,9 @@ if __name__ == '__main__':
                     f = cv.cvtColor(frameMap, cv.COLORSPACE_RGBA)
 
                 else:
-                    frameMap, x1, y1 = submatrix_video(frameV, (1525, 55), (1525 + 277, 55 + 277))
+                    frameMap, x1, y1 = submatrix_video(frameV, (1515, 50), (1515 + 288, 50 + 288))
                     f = cv.cvtColor(frameMap, cv.COLORSPACE_RGBA)
-                    f = cv.resize(f, None, None, 0.66, 0.66, cv.INTER_CUBIC)
+                    #f = cv.resize(f, None, None, 0.66, 0.66, cv.INTER_CUBIC)
 
                 frame_green = f[:, :, 1]
                 frame_blue = f[:, :, 0]
@@ -610,7 +663,7 @@ if __name__ == '__main__':
                 w, h = frame.shape[::-1]
                 # print("w: {:d} h: {:d}".format(w, h))
 
-                # mr
+                # mr TODO mr & omitFrame = True?
                 if mg < 60:
                     omitFrame = True
                     continue
@@ -625,22 +678,23 @@ if __name__ == '__main__':
                 if len(lastPositions) > 5 and not omitFrame:
                     # if we already have a few last positions we can cut down to a smaller map as there is not teleport available:
                     # submatrix size
-                    n = 250
+                    n = 300
                     p = lastPositions[-1]
-                    img_small, x1, y1 = submatrix(img, p, n)
+                    img_small, x1, y1 = submatrix(img_map, p, n)
                     res = cv.matchTemplate(img_small, frame, cv.TM_CCOEFF_NORMED)
                     min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
                     top_left = (max_loc[0] + x1, max_loc[1] + y1)
 
                 else:
-                    res = cv.matchTemplate(img, frame, cv.TM_CCOEFF_NORMED)
+                    res = cv.matchTemplate(img_map, frame, cv.TM_CCOEFF_NORMED)
                     min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
                     top_left = max_loc
 
                 # check if it is on the island or not ...
-                if img_mask[int(top_left[1] + w / 2), int(top_left[0] + h / 2)] < 128:
-                    omitFrame = True
-                    # print("frame {:06d} has mask {:03d}".format(count, img_mask[int(top_left[0] + w / 2), int(top_left[1] + h / 2)]))
+                if img_map_mask[int(top_left[1] + w / 2), int(top_left[0] + h / 2)] < 128:
+                   omitFrame = True
+                   if visualization_general_info:
+                        print("frame {:06d} has mask {:03d}".format(frameId, img_map_mask[int(top_left[0] + w / 2), int(top_left[1] + h / 2)]))
 
                 if max_val > 0.35 and not omitFrame:
                     lastPositions.append(top_left)
@@ -689,6 +743,7 @@ if __name__ == '__main__':
                 if output_read_num_next_to_icon and visualization_read_num_next_to_icon:
                     cv.imshow("player_count_img", count_img)
                     cv.imshow("kills_count_img", kills_img)
+                    #cv.imwrite("kills_imgs/kills_img_{:06.0f}.png".format(frameId), kills_img)
                     cv.waitKey(1)
 
                 if len(count_players) > 2 or not pattern_player_count.match(count_players):
@@ -745,12 +800,15 @@ if __name__ == '__main__':
                             cv.circle(vis, center, 16, (0, 255, 255, 50), 2)
                         else:
                             cv.circle(vis, center, 16, (255, 0, 255, 50), 3)
-                    # cv.imshow("result", heatmap*255/np.max(heatmap))
+                    cv.namedWindow('heatmap-result', cv.WINDOW_NORMAL)
+                    cv.resizeWindow('heatmap-result', 1000, 1000)
+                    #cv.imshow("heatmap-result", cv.resize(heatmap*255/np.max(heatmap), (0, 0), fx=0.75, fy=0.75))
+                    #cv.imshow("heatmap-result", heatmap*255/np.max(heatmap))
                     cv.namedWindow('result', cv.WINDOW_NORMAL)
                     cv.resizeWindow('result', 1000, 1000)
                     cv.imshow("result", vis)
-                    # cv.imshow("result", cv.resize(vis, (0, 0), fx=0.75, fy=0.75))
-                    cv.imshow("frame", frame)
+                    #cv.imshow("result", cv.resize(vis, (0, 0), fx=0.75, fy=0.75))
+                    cv.imshow("map_frame", frame)
                     cv.waitKey(1)
     cap.release()
     if not waiting4newround:

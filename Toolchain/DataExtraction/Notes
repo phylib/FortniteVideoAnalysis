@@ -1,0 +1,158 @@
+
+Orig. Blank map from:
+https://epicgames.ent.box.com/s/kj6svwa8ex38hgtsecehigxopwev26n7/file/540390103838
+other orig assets:
+https://epicgames.ent.box.com/s/kj6svwa8ex38hgtsecehigxopwev26n7/folder/87746568550
+
+inofficial map from: (wrong font ect)
+https://www.reddit.com/r/FortNiteBR/comments/di7nlq/fortnite_chpt_2_season_1_season_11_map_in_8k/
+
+
+Info season 11:
+https://www.forbes.com/sites/davidthier/2019/10/15/fortnite-patch-notes-11-of-the-biggest-changes-chapter-2/
+
+https://mixer.com/MrCleanTv?vod=3JryR7aJsEiVsZoLQ24KDQ
+
+
+###Streamers
+https://mixer.com/BigMace101    (1080) NOPE ->
+https://mixer.com/Allenownz     (1080) NOPE -> pc
+https://mixer.com/ImJayson?vod=H6u025yQyEu4gtOqxEFbyg
+
+
+https://mixer.com/Flopysock?vod=oOrNh5Le9kaN8wHzpwHU5w (720)   NOPE -> stream overlay over map
+
+
+https://mixer.com/Birdo?vod=UThkI19nR0ibhrdYMDPJow (720)
+
+https://mixer.com/SapphireFang?vod=3kj8ndIto0eMAq4OF-nGjg (720)  NOPE -> overlay over Phase Icon
+
+has solo streams
+https://mixer.com/HussyFTP?vod=Fhb78x_jxUijozW8TOpxuw (XB)
+
+https://mixer.com/RealRetro (PC)
+
+
+cmd:
+-i /home/itec-linux/Videos/Fortnite_mixer_vods/BzrkPugs/20180303_22290578_1520119554.mp4 -m /home/itec-linux/Desktop/rndtest/meta-test.csv -r /home/itec-linux/Desktop/rndtest/round-test- -v True
+
+
+(older) find /home/itec-linux/Videos/Fortnite_mixer_vods/ | grep .mp4 | xargs -P 4 -I {} python3 template_match_4.py -i {} -m ~/Desktop/rndtest/meta-test.csv -r ~/Desktop/rndtest/round-test-
+
+find /home/itec-linux/Videos/Fortnite_mixer_vods/ | grep .mp4 | xargs -I {} python3 template_match_4.py -i {} -o ~/Desktop -v True
+
+
+
+Pycharm Run Params:
+new
+-i /home/itec-linux/Videos/Fortnite_mixer_vods/BzrkPugs/20180303_22290578_1520119554.mp4 -m /home/itec-linux/Desktop/rndtest/meta-test.csv -r /home/itec-linux/Desktop/rndtest/round-test- -v True
+
+###OLD Versions / cmd commands  etc.
+-i /home/itec-linux/Desktop/Videos/Fn10-20180323_Gm1_pEAF7nY.mp4 -m /home/itec-linux/Desktop/fintest.csv -r /home/itec-linux/Desktop/fntest_round- -v True
+
+OpenCV version installed for last time: opencv_version 3.4.1
+
+Tesseract --version	tesseract 4.0.0-beta.1
+
+PyORC 
+python3	pyocr (0.7.2) * not sure if it got updated before checking old version thou...
+python	pyocr (0.6)
+
+
+
+
+
+###NEEDED FOR SCRIPT
+https://pypi.org/project/opencv-contrib-python/      version 3.4.1.15
+$python3 -m pip install opencv-contrib-python==3.4.1.15
+
+Tesseract --version	tesseract 4.0.0-beta.1
+Tesseract is used in legacy mode so this change needs to be applied:
+Replace 'tesseract-ocr/4.00/tessdata/eng.traineddata' with '--oem 0' flag compatible version from https://github.com/tesseract-ocr/tessdata/blob/master/eng.traineddata
+
+???(or https://github.com/tesseract-ocr/tesseract/wiki/Data-Files#data-files-for-version-304305)???  --> dosen't work
+
+
+For heatmappy dependency "imageio_ffmpeg"
+
+
+
+
+round-test-20180302_22088059_1520018917_2.csv  --> Single digit erkennung test
+/home/itec-linux/Videos/Fortnite_mixer_vods/EricMandoval/20180302_22088059_1520018917.mp4	2	00:07:39	00:29:27	1	8	11
+
+
+/home/itec-linux/Videos/Fortnite_mixer_vods/EricMandoval/20180302_22088059_1520018917.mp4,1,00:04:46,00:06:09,0,83,1,
+/home/itec-linux/Videos/Fortnite_mixer_vods/EricMandoval/20180302_22088059_1520018917.mp4,2,00:07:39,00:29:27,1,1,12,
+
+
+
+###Videos
+
+https://mixer.com/BigMace101?vod=XL_arLO29EadeSEjxIeuSQ
+
+
+
+###RANDOM
+new video run params
+-i "/media/itec-linux/My Passport/fn/fn-new-videos/SPOOKIELU/20191029_oosyvsOupkikG3dt4IrBMA_1572380529.mp4" -o /home/itec-linux/Desktop -v True -t True
+
+
+
+
+*****
+-i "/home/itec-linux/Videos/fn_cuts/SPOOKIELU/20191029_oosyvsOupkikG3dt4IrBMA_1572380529.mp4_cut.mp4" -o /home/itec-linux/Desktop -v True -t True
+
+find /home/itec-linux/Videos/Fortnite_mixer_vods/ | grep .mp4 | xargs -I {} python3 template_match_4_scaled.py -i {} -o ~/Desktop/  -v True -t True
+find /home/itec-linux/Videos/Fortnite_mixer_vods/ | grep .mp4 | xargs -P 4 -I {} python3 template_match_4_scaled.py -i {} -o ~/Desktop/  -v True -t True
+
+*****
+
+
+
+~~~~~
+https://answers.opencv.org/question/169613/how-does-macthtemplate-deal-with-scaling/
+https://www.pyimagesearch.com/2015/01/26/multi-scale-template-matching-using-python-opencv/
+    |->addition? ->http://www.computervisionblog.com/2011/08/blazing-fast-nmsm-from-exemplar-svm.html
+https://github.com/matejak/imreg_dft
+
+    or this?
+    https://www.pyimagesearch.com/2014/11/10/histogram-oriented-gradients-object-detection/
+
+
+
+https://www.geeksforgeeks.org/find-and-draw-contours-using-opencv-python/
+
+O.o https://docs.opencv.org/2.4/doc/tutorials/imgproc/shapedescriptors/find_contours/find_contours.html  find conture on canny O.o
+
+~~~~~
+----
+https://www.youtube.com/watch?v=rsgoQtBarYg
+https://www.youtube.com/watch?v=XnNyrI-kio8
+https://www.youtube.com/watch?v=p1RgfpIObyE
+https://www.youtube.com/watch?v=TuzRrZjaHac
+https://www.youtube.com/watch?v=RiQ7E1oHt84
+
+
+
+###ERRORS
+
+Done:
+    OpenCV(3.4.1) Error: Assertion failed (s >= 0) in setSize, file /io/opencv/modules/core/src/matrix.cpp, line 235
+    Traceback (most recent call last):
+      File "template_match_4_scaled.py", line 663, in <module>
+        current_phase, max_val, max_loc = phase_find_best_match(region, phase_icons, mask_icon)
+      File "template_match_4_scaled.py", line 35, in phase_find_best_match
+        result.append(cv.matchTemplate(region, phase_icons[icon_idx], cv.TM_CCORR_NORMED, mask=mask_icon))
+    cv2.error: OpenCV(3.4.1) /io/opencv/modules/core/src/matrix.cpp:235: error: (-215) s >= 0 in function setSize
+
+
+    20191130_qONTrtE_VkmWsaWg1YZDuA_1575151268.mp4 --> Starts Big then goes small at 1:14:42
+    20191130_9Dt0tBy7gEiafVdU6CaYXw_1575092537.mp4 -->  --          ||         --
+
+20191205_1Mfc0pH7tUyW6tQ-bnp79A_1575576753 Versus mode in Battle royale style --> manuel removal?
+
+
+
+
+-d /home/itec-linux/Desktop/fn-dataextraction/fn-dataextraction_28-01-20_09.01.27/ -i "/home/itec-linux/Desktop/fn-dataextraction/fn-dataextraction_28-01-20_09.01.27/match-overview_extended.csv" -o HeatmapTest.28.01.20
