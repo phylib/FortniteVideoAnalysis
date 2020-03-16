@@ -1,0 +1,8 @@
+
+On branch `master`:
+
+    python3 normalized_heatmap.py -d ../../../Data/Traces/movement_traces/ -i ../../../Data/Traces/game_overview_valid.csv -o ../old-map/
+
+On branch `working-version`
+
+    python3 normalized_heatmap.py -d ../../../Data/Traces/movement_traces_new_map/ -i ../../../Data/Traces/game_overview_new_map.csv -o ../new-map/
