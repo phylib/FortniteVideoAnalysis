@@ -42,6 +42,16 @@ def find_first(list,number):
             return list[i][1]
 
 
+def get_correct_case_filename(filename):
+    folder = "/".join(filename.split("/")[:-1])
+    fileonly_name = filename.split("/")[-1]
+    files = os.listdir(folder)
+    for file in files:
+        if file.lower() == fileonly_name.lower():
+            fileonly_name = file
+            break
+    return folder + "/" + fileonly_name
+
 def ingest_file_content(file_path):
     temp = 0
     #file_path = file_path[0:-1]
@@ -58,6 +68,7 @@ def ingest_file_content(file_path):
     last_place_count = 100
 
     round_start_time = None
+    file_path = get_correct_case_filename(file_path)
 
     with open(file_path, 'r') as file:
         for line in file.readlines()[1:]:  # skip over header
@@ -245,7 +256,7 @@ def newHeatmapper(point_diameter=50):
 parser = argparse.ArgumentParser(description='Script to generate Fortnight Heatmaps.')
 parser.add_argument("-d", "--inputfiles", help="Folder with the trace files.")
 parser.add_argument("-i", "--inputlist", help="File with which traces should be used.")
-parser.add_argument("-o", "--output", help="Output folder and files name.")
+parser.add_argument("-o", "--output", help="Output folder and files name.", default="heatmaps/")
 parser.add_argument("-t", "--time", help="Start and end interval that's mapped (in seconds)", type=int, default=5)
 parser.add_argument("-x", "--max", help="Max distance a player moves per sec", type=float, default=3.606)
 parser.add_argument("-n", "--min", help="Min distance a player moves per sec (lowest value = 0)", type=float, default=1)
@@ -319,7 +330,7 @@ heatmapper_cutout_start, heatmapper_start = newHeatmapper(point_diameter=100)
 heatmapper_cutout_all, heatmapper_all = newHeatmapper()
 heatmapper_cutout_end, heatmapper_end = newHeatmapper()
 
-outpath = 'heatmaps/' + output + '/'
+outpath = output
 #outpath = 'heatmaps/' + output +'_'+ datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + '/'
 os.makedirs(outpath, exist_ok=True)
 
