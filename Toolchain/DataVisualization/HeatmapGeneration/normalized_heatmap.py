@@ -390,9 +390,9 @@ map_img = Image.open(map_path)
 white_path = 'white_2000x2000.png'
 white_img = Image.open(white_path)
 
-heatmapper_cutout_start, heatmapper_start = newHeatmapper(point_diameter=100)
-heatmapper_cutout_all, heatmapper_all = newHeatmapper()
-heatmapper_cutout_end, heatmapper_end = newHeatmapper()
+heatmapper_cutout_start, heatmapper_start = newHeatmapper(point_diameter=133)
+heatmapper_cutout_all, heatmapper_all = newHeatmapper(point_diameter=67)
+heatmapper_cutout_end, heatmapper_end = newHeatmapper(point_diameter=67)
 
 outpath = output
 #outpath = 'heatmaps/' + output +'_'+ datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + '/'
