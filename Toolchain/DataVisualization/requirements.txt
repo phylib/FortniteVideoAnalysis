@@ -1,0 +1,8 @@
+heatmappy
+numpy==1.10.1
+Pillow==3.0.0
+#PySide
+moviepy==0.2.2.11
+pytz==2015.7
+python-dateutil==2.4.2
+imageio-ffmpeg
