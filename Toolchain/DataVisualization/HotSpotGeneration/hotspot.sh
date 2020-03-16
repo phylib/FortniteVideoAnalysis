@@ -10,7 +10,7 @@ BTARGET=${NAME}HotspotBlue.png
 GTARGET=${NAME}HotspotGreen.png
 OTARGET=${NAME}HotspotOrange.png
 
-convert $INPUT -threshold 35% $TARGET
+convert $INPUT -threshold 50% $TARGET
 convert $TARGET -morphology Erode Octagon:10 $TARGET
 convert $TARGET -morphology Dilate Octagon:10 $TARGET
 convert $TARGET -fill $BLUE -opaque white $BTARGET
