@@ -6,3 +6,7 @@ The repository is structured as follows:
 
 - **Data**: Contains trace files as well as survey data.
 - **Toolchain**: Contains information and source code from the toolchain and information and how to use it.
+- **Questionnaire**: Contains the full questionnaire used for the user study
+
+For any questions concerning this repository, please do not hesitate to contact
+the authors.
